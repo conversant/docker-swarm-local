@@ -1,0 +1,9 @@
+[docker]
+    watch = true
+    swarmmode = true
+
+[api]
+    dashboard = true
+
+[api.statistics]
+    recentErrors = 10

@@ -1,0 +1,25 @@
+version: "3.4"
+
+networks:
+  proxy:
+    external:
+      name: registry-net # makes sure to create overlay network
+ 
+services:
+  registry:
+    image: registry:2
+    ports:
+      - 5000:5000
+    networks:
+      - proxy
+    volumes:
+      - "/mnt/registry:/var/lib/registry" # make sure to create mount /mnt/registry
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+          parallelism: 1
+          delay: 20s
+          order: start-first

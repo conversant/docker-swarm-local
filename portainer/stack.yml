@@ -1,0 +1,51 @@
+version: "3.4"
+
+networks:
+  traefik-net:
+    external: true
+  portainer_agent:
+    driver: overlay
+    attachable: true
+ 
+services:
+  portainer:
+    image: portainer/portainer
+    networks:
+      - traefik-net
+    volumes:
+      - "/mnt/portainer:/data" # make sure to create mount /mnt/portainer
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.host1.frontend.rule=Host:portainer.${HOST}.local
+        - traefik.host2.frontend.rule=Host:portainer.${HOST}.vip
+        - traefik.port=9000
+        - traefik.docker.network=traefik-net
+        - traefik.backend.loadbalancer.stickiness=true
+      placement:
+        constraints:
+          - node.role == manager
+      update_config:
+          parallelism: 1
+          delay: 10s
+          order: start-first
+      resources:
+        limits:
+          memory: 1G
+
+  agent:
+    image: portainer/agent
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - target: 9001
+        published: 8081
+        protocol: tcp
+        mode: host
+    networks:
+      - portainer_agent
+    deploy:
+      mode: global

@@ -1,0 +1,28 @@
+version: "3.4"
+
+networks:
+  registry-net:
+    external: true
+  traefik-net:
+    external: true
+ 
+services:
+  registry-web:
+    image: konradkleine/docker-registry-frontend:v2
+    networks:
+      - registry-net
+      - traefik-net
+    environment:
+      - ENV_DOCKER_REGISTRY_HOST=$IP
+      - ENV_DOCKER_REGISTRY_PORT=5000
+      - ENV_DEFAULT_REPOSITORIES_PER_PAGE=50
+    deploy:
+      replicas: 1
+      labels:
+        - traefik.frontend.rule=Host:registry.${HOST}.local
+        - traefik.docker.network=traefik-net
+        - traefik.port=80
+      update_config:
+          parallelism: 1
+          delay: 10s
+          order: start-first

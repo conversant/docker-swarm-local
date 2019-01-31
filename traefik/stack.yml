@@ -1,0 +1,28 @@
+version: "3.4"
+
+networks:
+  proxy:
+    external:
+      name: traefik-net # makes sure to create overlay network
+ 
+services:
+  traefik:
+    image: ${IP}:5000/traefik
+    build: .
+    ports:
+      - 80:80
+    networks:
+      - proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    deploy:
+      replicas: 1
+      labels:
+       - traefik.route1.frontend.rule=PathPrefixStrip:/traefik;PathPrefix:/traefik
+       - traefik.route2.frontend.rule=Host:traefik.docker-swarm.local
+       - traefik.docker.network=traefik-net
+       - traefik.port=8080
+      update_config:
+          parallelism: 1
+          delay: 10s
+          order: start-first
