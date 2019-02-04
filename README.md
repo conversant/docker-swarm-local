@@ -26,7 +26,7 @@ From the root of the project directory, run the following command:
 
 Jupyter will launch in a Web-browser and you should see jupyter-notebook.ipynb. Select it to open the notebook. Follow allong by running each step in the notebook.
 
-## Services of Docker Swarm Dev
+## Services of Docker Swarm Local
 
 * [Registry](https://hub.docker.com/_/registry/)
 * [Traefik](https://hub.docker.com/_/traefik/)
